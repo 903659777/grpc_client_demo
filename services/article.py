@@ -1,16 +1,27 @@
 # -*- coding = utf-8 -*-
 # @Time :2024/10/25 14:46
 import grpc
+
 from services.protos import article_pb2, article_pb2_grpc
 from utils.single import SingletonMeta
 from services.decorators import grpc_error_handler
+from utils.demo_consul import DemoConsul
+
+demo_consul = DemoConsul()
 
 
 class ArticleStub:
     """ 创建一个异步上下文管理器，创建gRPC服务的连接通道 """
 
     def __init__(self):
-        self.article_service_addr = "127.0.0.1:5000"
+        # self.article_service_addr = "127.0.0.1:5000"
+        pass
+
+    @property
+    def article_service_addr(self):
+        host, port = demo_consul.get_one_grpc_servic_demo_service_address()
+        print(f"获取到的地址：{host}:{port}")
+        return f"{host}:{port}"
 
     async def __aenter__(self):
         self.channel = grpc.aio.insecure_channel(self.article_service_addr)
